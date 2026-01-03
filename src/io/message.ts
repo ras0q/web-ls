@@ -3,23 +3,31 @@
  */
 
 import { type } from "arktype";
-import type { JsonRpcResponse } from "../types/jsonrpc.ts";
+import type { JsonRpcRequest, JsonRpcResponse } from "../types/jsonrpc.ts";
 import { JsonRpcResponse as JsonRpcResponseValidator } from "../types/jsonrpc.ts";
 
 /**
- * Write a JSON-RPC response to stdout.
+ * Write a JSON-RPC message (request or response) to stdout.
  */
-export function writeMessage(response: JsonRpcResponse): void {
-  const validatedResponse = JsonRpcResponseValidator(response);
-  if (validatedResponse instanceof type.errors) {
-    console.error("Invalid JSON-RPC response:", validatedResponse.summary);
-    return;
+export function writeMessage(
+  message: JsonRpcResponse | Omit<JsonRpcRequest, "id">,
+): void {
+  // For response, validate it
+  if ("result" in message || "error" in message) {
+    const validatedResponse = JsonRpcResponseValidator(
+      message as JsonRpcResponse,
+    );
+    if (validatedResponse instanceof type.errors) {
+      console.error("Invalid JSON-RPC response:", validatedResponse.summary);
+      return;
+    }
   }
+  // For server-initiated requests, no id is needed so we just write them
 
-  const content = JSON.stringify(response);
-  const message = `Content-Length: ${content.length}\r\n\r\n${content}`;
+  const content = JSON.stringify(message);
+  const messageStr = `Content-Length: ${content.length}\r\n\r\n${content}`;
   const encoder = new TextEncoder();
-  Deno.stdout.writeSync(encoder.encode(message));
+  Deno.stdout.writeSync(encoder.encode(messageStr));
 }
 
 /**

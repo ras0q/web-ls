@@ -6,12 +6,13 @@ import type {
   InitializeResult,
   ServerCapabilities,
 } from "vscode-languageserver-protocol";
-import type { JsonRpcRequest, JsonRpcResponse } from "../types/jsonrpc.ts";
+import type { JsonRpcRequest } from "../types/jsonrpc.ts";
+import type { HandlerOutput } from "../types/handler.ts";
 
 /**
  * Handle initialize request.
  */
-export function handleInitialize(request: JsonRpcRequest): JsonRpcResponse {
+export function handleInitialize(request: JsonRpcRequest): HandlerOutput {
   const result: InitializeResult = {
     capabilities: {
       definitionProvider: true,
@@ -19,8 +20,10 @@ export function handleInitialize(request: JsonRpcRequest): JsonRpcResponse {
   };
 
   return {
-    jsonrpc: "2.0",
-    id: request.id,
-    result,
+    response: {
+      jsonrpc: "2.0",
+      id: request.id,
+      result,
+    },
   };
 }

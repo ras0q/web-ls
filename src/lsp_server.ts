@@ -5,20 +5,21 @@
 
 import { type } from "arktype";
 
-import type { JsonRpcRequest, JsonRpcResponse } from "./types/jsonrpc.ts";
+import type { JsonRpcRequest } from "./types/jsonrpc.ts";
 import { JsonRpcRequest as JsonRpcRequestValidator } from "./types/jsonrpc.ts";
 import type { LspContext } from "./types/lsp.ts";
+import type { HandlerOutput } from "./types/handler.ts";
 import { readMessage, writeMessage } from "./io/message.ts";
 import { handleInitialize } from "./handlers/initialize.ts";
 import { handleTextDocumentDefinition } from "./handlers/textDocument_definition.ts";
 
 /**
- * Validate and process a single JSON-RPC request and return response.
+ * Validate and process a single JSON-RPC request and return handler output.
  */
 export async function processRequest(
   request: JsonRpcRequest,
   context: LspContext,
-): Promise<JsonRpcResponse> {
+): Promise<HandlerOutput> {
   try {
     switch (request.method) {
       case "initialize":
@@ -30,29 +31,34 @@ export async function processRequest(
         );
       default:
         return {
-          jsonrpc: "2.0",
-          id: request.id,
-          error: {
-            code: -32601,
-            message: `Method not found: ${request.method}`,
+          response: {
+            jsonrpc: "2.0",
+            id: request.id,
+            error: {
+              code: -32601,
+              message: `Method not found: ${request.method}`,
+            },
           },
-        } satisfies JsonRpcResponse;
+        } satisfies HandlerOutput;
     }
   } catch (error) {
     console.error("Handler error:", error);
     return {
-      jsonrpc: "2.0",
-      id: request.id,
-      error: {
-        code: -32603,
-        message: "Internal error",
+      response: {
+        jsonrpc: "2.0",
+        id: request.id,
+        error: {
+          code: -32603,
+          message: "Internal error",
+        },
       },
-    } satisfies JsonRpcResponse;
+    } satisfies HandlerOutput;
   }
 }
 
 /**
  * Start the LSP server.
+ * Handles all side effects (I/O operations).
  */
 export async function startLspServer(context: LspContext) {
   while (true) {
@@ -72,9 +78,14 @@ export async function startLspServer(context: LspContext) {
       continue;
     }
 
-    const response = await processRequest(validatedRequest, context);
-    if (response) {
-      writeMessage(response);
+    const output = await processRequest(validatedRequest, context);
+
+    // Send response to client
+    writeMessage(output.response);
+
+    // If handler generated a server request, send it
+    if (output.serverRequest) {
+      writeMessage(output.serverRequest);
     }
   }
 }

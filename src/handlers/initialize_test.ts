@@ -13,17 +13,32 @@ Deno.test("initialize handler - returns capabilities", () => {
     id: 1,
   };
 
-  const response = handleInitialize(request);
+  const output = handleInitialize(request);
 
-  assertEquals(response.jsonrpc, "2.0");
-  assertEquals(response.id, 1);
+  assertEquals(output.response.jsonrpc, "2.0");
+  assertEquals(output.response.id, 1);
   if (
-    response.result &&
-    typeof response.result === "object" &&
-    "capabilities" in response.result
+    output.response.result &&
+    typeof output.response.result === "object" &&
+    "capabilities" in output.response.result
   ) {
-    const result = response.result as Record<string, unknown>;
+    const result = output.response.result as Record<string, unknown>;
     const capabilities = result.capabilities as Record<string, unknown>;
     assertEquals(capabilities.definitionProvider, true);
   }
+  assertEquals(output.serverRequest, undefined);
+});
+
+Deno.test("initialize handler - returns handler output without server request", () => {
+  const request: JsonRpcRequest = {
+    jsonrpc: "2.0",
+    method: "initialize",
+    id: "test-id",
+  };
+
+  const output = handleInitialize(request);
+
+  assertEquals(output.response.jsonrpc, "2.0");
+  assertEquals(output.response.id, "test-id");
+  assertEquals(output.serverRequest, undefined);
 });

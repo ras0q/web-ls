@@ -6,7 +6,8 @@ import type {
   DefinitionParams,
   Location,
 } from "vscode-languageserver-protocol";
-import type { JsonRpcRequest, JsonRpcResponse } from "../types/jsonrpc.ts";
+import type { JsonRpcRequest } from "../types/jsonrpc.ts";
+import type { HandlerOutput } from "../types/handler.ts";
 import type { LspContext } from "../types/lsp.ts";
 import { extractLinkAtPosition } from "../link_parser.ts";
 import { checkCache } from "../cache.ts";
@@ -18,7 +19,7 @@ import { fetchUrl } from "../fetcher.ts";
 export async function handleTextDocumentDefinition(
   request: JsonRpcRequest,
   context: LspContext,
-): Promise<JsonRpcResponse> {
+): Promise<HandlerOutput> {
   // TODO: Validate request params
   const params = request.params as DefinitionParams;
 
@@ -34,9 +35,11 @@ export async function handleTextDocumentDefinition(
   // Get line at cursor position
   if (position.line >= lines.length) {
     return {
-      jsonrpc: "2.0",
-      id: request.id,
-      result: null,
+      response: {
+        jsonrpc: "2.0",
+        id: request.id,
+        result: null,
+      },
     };
   }
 
@@ -48,9 +51,11 @@ export async function handleTextDocumentDefinition(
   if (!url) {
     // No link found
     return {
-      jsonrpc: "2.0",
-      id: request.id,
-      result: null,
+      response: {
+        jsonrpc: "2.0",
+        id: request.id,
+        result: null,
+      },
     };
   }
 
@@ -62,23 +67,21 @@ export async function handleTextDocumentDefinition(
     const fetchResult = await fetchUrl(url, context.cacheDir);
 
     if (fetchResult.isExternal) {
-      // TODO: implement
       // Send window/showDocument request for external URLs
-      // const showDocRequest: JsonRpcResponse = {
-      //   jsonrpc: "2.0",
-      //   method: "window/showDocument",
-      //   params: {
-      //     uri: url,
-      //     external: true,
-      //   },
-      // };
-      // writeMessage(showDocRequest);
-
-      // Return null for the definition
       return {
-        jsonrpc: "2.0",
-        id: request.id,
-        result: null,
+        response: {
+          jsonrpc: "2.0",
+          id: request.id,
+          result: null,
+        },
+        serverRequest: {
+          jsonrpc: "2.0",
+          method: "window/showDocument",
+          params: {
+            uri: url,
+            external: true,
+          },
+        },
       };
     }
 
@@ -95,8 +98,10 @@ export async function handleTextDocumentDefinition(
   };
 
   return {
-    jsonrpc: "2.0",
-    id: request.id,
-    result: location,
+    response: {
+      jsonrpc: "2.0",
+      id: request.id,
+      result: location,
+    },
   };
 }

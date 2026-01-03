@@ -32,11 +32,12 @@ Deno.test({
         id: 1,
       };
 
-      const response = await handleTextDocumentDefinition(request, context);
+      const output = await handleTextDocumentDefinition(request, context);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 1);
-      assertEquals(response.result, null);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 1);
+      assertEquals(output.response.result, null);
+      assertEquals(output.serverRequest, undefined);
     } finally {
       try {
         await Deno.remove(testFile);
@@ -72,11 +73,12 @@ Deno.test({
         id: 2,
       };
 
-      const response = await handleTextDocumentDefinition(request, context);
+      const output = await handleTextDocumentDefinition(request, context);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 2);
-      assertEquals(response.result, null);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 2);
+      assertEquals(output.response.result, null);
+      assertEquals(output.serverRequest, undefined);
     } finally {
       try {
         await Deno.remove(testFile);
@@ -112,12 +114,19 @@ Deno.test({
         id: 3,
       };
 
-      const response = await handleTextDocumentDefinition(request, context);
+      const output = await handleTextDocumentDefinition(request, context);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 3);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 3);
       // Response should have result (location or null depending on fetch result)
-      assertEquals(response.result !== undefined, true);
+      assertEquals(output.response.result !== undefined, true);
+      // External URLs will have serverRequest, cached/local URLs won't
+      assertEquals(
+        output.serverRequest === undefined ||
+          (typeof output.serverRequest === "object" &&
+            output.serverRequest.method === "window/showDocument"),
+        true,
+      );
     } finally {
       try {
         await Deno.remove(testFile);

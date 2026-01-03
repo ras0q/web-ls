@@ -23,13 +23,14 @@ Deno.test("processRequest - initialize method", async () => {
     id: 1,
   };
 
-  const response = await processRequest(request, mockContext);
+  const output = await processRequest(request, mockContext);
 
-  assertEquals(response.jsonrpc, "2.0");
-  assertEquals(response.id, 1);
-  assertEquals(response.error, undefined);
+  assertEquals(output.response.jsonrpc, "2.0");
+  assertEquals(output.response.id, 1);
+  assertEquals(output.response.error, undefined);
+  assertEquals(output.serverRequest, undefined);
 
-  const { result } = response;
+  const { result } = output.response;
   assertEquals(
     typeof result === "object" &&
       result &&
@@ -50,14 +51,18 @@ Deno.test("processRequest - unknown method", async () => {
     id: 2,
   };
 
-  const response = await processRequest(request, mockContext);
+  const output = await processRequest(request, mockContext);
 
-  assertEquals(response.jsonrpc, "2.0");
-  assertEquals(response.id, 2);
-  assertEquals(response.result, undefined);
-  assertEquals(response.error !== undefined, true);
-  assertEquals(response.error!.code, -32601);
-  assertEquals(response.error!.message.includes("Method not found"), true);
+  assertEquals(output.response.jsonrpc, "2.0");
+  assertEquals(output.response.id, 2);
+  assertEquals(output.response.result, undefined);
+  assertEquals(output.response.error !== undefined, true);
+  assertEquals(output.response.error!.code, -32601);
+  assertEquals(
+    output.response.error!.message.includes("Method not found"),
+    true,
+  );
+  assertEquals(output.serverRequest, undefined);
 });
 
 Deno.test({
@@ -80,11 +85,12 @@ Deno.test({
         id: 3,
       };
 
-      const response = await processRequest(request, mockContext);
+      const output = await processRequest(request, mockContext);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 3);
-      assertEquals(response.result, null);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 3);
+      assertEquals(output.response.result, null);
+      assertEquals(output.serverRequest, undefined);
     } finally {
       try {
         await Deno.remove(testFile);
@@ -115,11 +121,12 @@ Deno.test({
         id: 4,
       };
 
-      const response = await processRequest(request, mockContext);
+      const output = await processRequest(request, mockContext);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 4);
-      assertEquals(response.result, null);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 4);
+      assertEquals(output.response.result, null);
+      assertEquals(output.serverRequest, undefined);
     } finally {
       try {
         await Deno.remove(testFile);
@@ -150,13 +157,14 @@ Deno.test({
         id: 5,
       };
 
-      const response = await processRequest(request, mockContext);
+      const output = await processRequest(request, mockContext);
 
-      assertEquals(response.jsonrpc, "2.0");
-      assertEquals(response.id, 5);
+      assertEquals(output.response.jsonrpc, "2.0");
+      assertEquals(output.response.id, 5);
       // Result should be either null or a Location object
       assertEquals(
-        typeof response.result === "object" || response.result === null,
+        typeof output.response.result === "object" ||
+          output.response.result === null,
         true,
       );
     } finally {
