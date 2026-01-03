@@ -103,6 +103,37 @@ Goal: Future coding agents should understand the state in **30 seconds** with
 **After updating logs**: Always run `deno task check:fix` to ensure the log
 files follow proper formatting standards.
 
+### Current Status File
+
+**Important for Token Efficiency**: Maintain `logs/current.md` to reduce future
+token consumption.
+
+- **Purpose**: Single source of truth for project status, reducing need to read
+  multiple log files
+- **Update frequency**: After each completed phase/feature
+- **Content**:
+  - Current implementation progress with phase checkmarks
+  - Test status summary (counts, pass/fail)
+  - Architecture overview (diagram or text)
+  - Key files and line counts
+  - Current limitations
+  - Next steps (prioritized)
+  - Recent changes summary
+
+**Before starting work**: Read `logs/current.md` first (quick overview in ~30
+seconds)
+
+**After completing work**: Update `logs/current.md` with:
+
+1. Move completed phase to ✅ section
+2. Update test counts
+3. Add new section for completed phase if significant
+4. Update "Recent Changes Summary" section
+5. Adjust "Next Steps" priority list
+
+This approach significantly reduces context requirements for future agents
+compared to reading individual phase logs.
+
 ### Before Committing
 
 Always run these commands before committing:
