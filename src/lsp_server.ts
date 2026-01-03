@@ -139,10 +139,3 @@ export async function startLspServer() {
     }
   }
 }
-
-/**
- * Main entry point when run directly.
- */
-if (import.meta.main) {
-  await startLspServer();
-}

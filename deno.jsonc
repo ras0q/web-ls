@@ -1,7 +1,7 @@
 {
   "$schema": "https://raw.githubusercontent.com/denoland/deno/refs/heads/main/cli/schemas/config-file.v1.json",
   "tasks": {
-    "dev": "deno run --allow-all src/lsp_server.ts",
+    "dev": "deno run -P main.ts",
     "test": "deno test -P",
     "check": "deno fmt --check && deno lint && deno check -I --all .",
     "check:fix": "deno fmt && deno lint --fix && deno check -I --all ."
