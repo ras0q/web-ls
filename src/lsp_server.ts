@@ -4,10 +4,14 @@
  */
 
 import type {
+  DefinitionParams,
   InitializeResult,
   Location,
   ServerCapabilities,
 } from "vscode-languageserver-protocol";
+import { extractLinkAtPosition } from "./link_parser.ts";
+import { checkCache } from "./cache.ts";
+import { fetchUrl } from "./fetcher.ts";
 
 interface JsonRpcRequest {
   jsonrpc: string;
@@ -57,29 +61,115 @@ function handleInitialize(request: JsonRpcRequest) {
 /**
  * Handle textDocument/definition request.
  */
-function handleDefinition(request: JsonRpcRequest) {
-  // For now, return empty result
-  // This will be connected to the fetcher in Step 3
-  const result: Location | Location[] | null = null;
+async function handleDefinition(request: JsonRpcRequest) {
+  const params = request.params as DefinitionParams;
 
-  const response: JsonRpcResponse = {
-    jsonrpc: "2.0",
-    id: request.id,
-    result,
-  };
-  writeMessage(response);
+  try {
+    // Get document URI and position
+    const documentUri = params.textDocument.uri;
+    const position = params.position;
+
+    // Read document content from file
+    const filePath = documentUri.replace("file://", "");
+    const content = await Deno.readTextFile(filePath);
+    const lines = content.split("\n");
+
+    // Get line at cursor position
+    if (position.line >= lines.length) {
+      const response: JsonRpcResponse = {
+        jsonrpc: "2.0",
+        id: request.id,
+        result: null,
+      };
+      writeMessage(response);
+      return;
+    }
+
+    const line = lines[position.line];
+
+    // Extract link at cursor position
+    const url = extractLinkAtPosition(line, position.character);
+
+    if (!url) {
+      // No link found
+      const response: JsonRpcResponse = {
+        jsonrpc: "2.0",
+        id: request.id,
+        result: null,
+      };
+      writeMessage(response);
+      return;
+    }
+
+    // Check cache first
+    let cachePath = await checkCache(url);
+
+    // If not cached, fetch it
+    if (!cachePath) {
+      const fetchResult = await fetchUrl(url);
+
+      if (fetchResult.isExternal) {
+        // Send window/showDocument request for external URLs
+        const showDocRequest = {
+          jsonrpc: "2.0",
+          method: "window/showDocument",
+          params: {
+            uri: url,
+            external: true,
+          },
+        };
+        writeMessage(showDocRequest);
+
+        // Return null for the definition
+        const response: JsonRpcResponse = {
+          jsonrpc: "2.0",
+          id: request.id,
+          result: null,
+        };
+        writeMessage(response);
+        return;
+      }
+
+      cachePath = fetchResult.path;
+    }
+
+    // Return location of cached markdown file
+    const location: Location = {
+      uri: `file://${cachePath}`,
+      range: {
+        start: { line: 0, character: 0 },
+        end: { line: 0, character: 0 },
+      },
+    };
+
+    const response: JsonRpcResponse = {
+      jsonrpc: "2.0",
+      id: request.id,
+      result: location,
+    };
+    writeMessage(response);
+  } catch (error) {
+    // Error handling
+    console.error("Definition handler error:", error);
+    const response: JsonRpcResponse = {
+      jsonrpc: "2.0",
+      id: request.id,
+      result: null,
+    };
+    writeMessage(response);
+  }
 }
 
 /**
  * Process a single JSON-RPC request.
  */
-function processRequest(request: JsonRpcRequest) {
+async function processRequest(request: JsonRpcRequest) {
   switch (request.method) {
     case "initialize":
       handleInitialize(request);
       break;
     case "textDocument/definition":
-      handleDefinition(request);
+      await handleDefinition(request);
       break;
     default:
       // Unknown method - send error response
@@ -132,7 +222,7 @@ export async function startLspServer() {
 
     try {
       const request: JsonRpcRequest = JSON.parse(message);
-      processRequest(request);
+      await processRequest(request);
     } catch (error) {
       // Invalid JSON - ignore or send error response
       console.error("Failed to parse JSON-RPC message:", error);

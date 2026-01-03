@@ -123,3 +123,33 @@ Deno.test("LSP Server - textDocument/definition request", () => {
   const response = createLspResponse(method, 2);
   assertEquals(response.result, null);
 });
+
+Deno.test({
+  name: "LSP Server - definition with link extraction",
+  sanitizeOps: false,
+  sanitizeResources: false,
+  async fn() {
+    // Create a temporary test file with a markdown link
+    const testFile = "/tmp/crawl-ls-test.md";
+    const testContent = "Check [Example](https://example.com) here";
+    await Deno.writeTextFile(testFile, testContent);
+
+    try {
+      // Import and test the handler logic
+      const { extractLinkAtPosition } = await import("./link_parser.ts");
+
+      const line = testContent;
+      const character = 10; // cursor on "Example"
+
+      const url = extractLinkAtPosition(line, character);
+      assertEquals(url, "https://example.com");
+    } finally {
+      // Cleanup
+      try {
+        await Deno.remove(testFile);
+      } catch {
+        // Ignore cleanup errors
+      }
+    }
+  },
+});

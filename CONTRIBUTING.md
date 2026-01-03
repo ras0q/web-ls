@@ -86,6 +86,9 @@ and verbose explanations. Focus on:
 Goal: Future coding agents should understand the state in **30 seconds** with
 **minimal tokens**.
 
+**After updating logs**: Always run `deno task check:fix` to ensure the log
+files follow proper formatting standards.
+
 ### Before Committing
 
 Always run these commands before committing:
