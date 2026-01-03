@@ -1,6 +1,7 @@
 # CrawlLS
 
-A Language Server Protocol (LSP) implementation for browsing the web as a graph of Markdown files in TUI editors like Neovim.
+A Language Server Protocol (LSP) implementation for browsing the web as a graph
+of Markdown files in TUI editors like Neovim.
 
 ## Features
 
@@ -15,7 +16,8 @@ A Language Server Protocol (LSP) implementation for browsing the web as a graph 
 
 ## Contributing
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and how to get started.
+See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and how to
+get started.
 
 ## Architecture
 

@@ -1,18 +1,22 @@
 # Contribution Guidelines
 
-We welcome contributions to this project!
-Please follow these guidelines to ensure a smooth collaboration process.
+We welcome contributions to this project! Please follow these guidelines to
+ensure a smooth collaboration process.
 
 ## Start with an Issue
 
-Before submitting a pull request, please open an issue to discuss your proposed changes.
-This helps us understand the context and ensures that your contribution aligns with the project's goals.
+Before submitting a pull request, please open an issue to discuss your proposed
+changes. This helps us understand the context and ensures that your contribution
+aligns with the project's goals.
 
-For bug reports, please provide a [minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example) and describe your environment in detail.
+For bug reports, please provide a
+[minimal reproduction](https://stackoverflow.com/help/minimal-reproducible-example)
+and describe your environment in detail.
 
 ## Development Setup
 
 ### Requirements
+
 - Deno 2.x
 
 ### Getting Started
@@ -30,13 +34,19 @@ deno task dev
 ## Development Guidelines
 
 ### Code Style
-- **Prefer pure functions over classes**: Use functional programming style where possible
+
+- **Prefer pure functions over classes**: Use functional programming style where
+  possible
 - Keep functions simple and composable
-- Avoid stateful classes unless absolutely necessary for LSP server implementation
-- Follow Kent Beck's principles: TDD, simplicity ("Do the Simplest Thing That Could Possibly Work"), YAGNI
+- Avoid stateful classes unless absolutely necessary for LSP server
+  implementation
+- Follow Kent Beck's principles: TDD, simplicity ("Do the Simplest Thing That
+  Could Possibly Work"), YAGNI
 
 ### Dependency Management
-- **Always use `deno add` command** to add dependencies, never edit `deno.jsonc` manually
+
+- **Always use `deno add` command** to add dependencies, never edit `deno.jsonc`
+  manually
 - Examples:
   ```bash
   deno add npm:package-name@version
@@ -45,6 +55,7 @@ deno task dev
 - This ensures proper version resolution and lock file updates
 
 ### Testing
+
 - Write tests before implementation (TDD approach)
 - Test pure functions individually for better coverage
 - Run tests with: `deno test`
@@ -52,9 +63,11 @@ deno task dev
 
 ### Development Logs
 
-All implementation work is documented in the `logs/` directory. After completing a task or feature:
+All implementation work is documented in the `logs/` directory. After completing
+a task or feature:
 
-1. Create a new folder in `logs/` with a descriptive name (e.g., `01_fetcher_implementation/`)
+1. Create a new folder in `logs/` with a descriptive name (e.g.,
+   `01_fetcher_implementation/`)
 2. Add an `implementation.md` file documenting:
    - What was done
    - Technical decisions made
@@ -62,5 +75,27 @@ All implementation work is documented in the `logs/` directory. After completing
    - Lessons learned
    - Next steps
 
-This helps track progress and provides context for future development (especially useful when working with AI coding agents).
+**Important**: Keep logs **concise and precise**. Remove trial-and-error details
+and verbose explanations. Focus on:
 
+- Final implementation state
+- Key technologies and usage examples
+- Critical decisions and configurations
+- What the next developer needs to know
+
+Goal: Future coding agents should understand the state in **30 seconds** with
+**minimal tokens**.
+
+### Before Committing
+
+Always run these commands before committing:
+
+```bash
+# Run all tests in parallel
+deno test -P
+
+# Check and fix code formatting/linting
+deno task check:fix
+```
+
+All checks must pass before creating a pull request.
