@@ -3,6 +3,12 @@
  * Implements JSON-RPC protocol over stdin/stdout.
  */
 
+import type {
+  InitializeResult,
+  Location,
+  ServerCapabilities,
+} from "vscode-languageserver-protocol";
+
 interface JsonRpcRequest {
   jsonrpc: string;
   method: string;
@@ -18,20 +24,6 @@ interface JsonRpcResponse {
     code: number;
     message: string;
   };
-}
-
-interface Position {
-  line: number;
-  character: number;
-}
-
-interface TextDocumentIdentifier {
-  uri: string;
-}
-
-interface DefinitionParams {
-  textDocument: TextDocumentIdentifier;
-  position: Position;
 }
 
 /**
@@ -88,14 +80,16 @@ function sendResponse(stdio: Stdio, response: JsonRpcResponse) {
  * Handle initialize request.
  */
 function handleInitialize(request: JsonRpcRequest, stdio: Stdio) {
+  const result: InitializeResult = {
+    capabilities: {
+      definitionProvider: true,
+    } satisfies ServerCapabilities,
+  };
+
   const response: JsonRpcResponse = {
     jsonrpc: "2.0",
     id: request.id,
-    result: {
-      capabilities: {
-        definitionProvider: true,
-      },
-    },
+    result,
   };
   sendResponse(stdio, response);
 }
@@ -106,10 +100,12 @@ function handleInitialize(request: JsonRpcRequest, stdio: Stdio) {
 function handleDefinition(request: JsonRpcRequest, stdio: Stdio) {
   // For now, return empty result
   // This will be connected to the fetcher in Step 3
+  const result: Location | Location[] | null = null;
+
   const response: JsonRpcResponse = {
     jsonrpc: "2.0",
     id: request.id,
-    result: null,
+    result,
   };
   sendResponse(stdio, response);
 }
