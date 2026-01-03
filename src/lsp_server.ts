@@ -12,23 +12,28 @@ import type {
 import { extractLinkAtPosition } from "./link_parser.ts";
 import { checkCache } from "./cache.ts";
 import { fetchUrl } from "./fetcher.ts";
+import { type } from "arktype";
 
-interface JsonRpcRequest {
-  jsonrpc: string;
-  method: string;
-  params?: unknown;
-  id?: number;
-}
+const JsonRpcRequest = type({
+  jsonrpc: "string",
+  method: "string",
+  "params?": "unknown",
+  "id?": "number",
+});
+export type JsonRpcRequest = typeof JsonRpcRequest.infer;
 
-interface JsonRpcResponse {
-  jsonrpc: string;
-  id?: number;
-  result?: unknown;
-  error?: {
-    code: number;
-    message: string;
-  };
-}
+const JsonRpcError = type({
+  code: "number",
+  message: "string",
+});
+
+const JsonRpcResponse = type({
+  jsonrpc: "string",
+  "id?": "number",
+  "result?": "unknown",
+  "error?": JsonRpcError,
+});
+export type JsonRpcResponse = typeof JsonRpcResponse.infer;
 
 export interface LspContext {
   cacheDir: string;
@@ -38,6 +43,12 @@ export interface LspContext {
  * Write a JSON-RPC response to stdout.
  */
 function writeMessage(response: JsonRpcResponse): void {
+  const validatedResponse = JsonRpcResponse(response);
+  if (validatedResponse instanceof type.errors) {
+    console.error("Invalid JSON-RPC response:", validatedResponse.summary);
+    return;
+  }
+
   const content = JSON.stringify(response);
   const message = `Content-Length: ${content.length}\r\n\r\n${content}`;
   const encoder = new TextEncoder();
@@ -165,28 +176,33 @@ async function handleDefinition(request: JsonRpcRequest, context: LspContext) {
 }
 
 /**
- * Process a single JSON-RPC request.
+ * Validate and process a single JSON-RPC request.
  */
 async function processRequest(
   request: JsonRpcRequest,
   context: LspContext,
 ) {
-  switch (request.method) {
+  const validatedRequest = JsonRpcRequest(request);
+  if (validatedRequest instanceof type.errors) {
+    console.error("Invalid JSON-RPC request:", validatedRequest.summary);
+    return;
+  }
+
+  switch (validatedRequest.method) {
     case "initialize":
-      handleInitialize(request);
+      handleInitialize(validatedRequest);
       break;
     case "textDocument/definition":
-      await handleDefinition(request, context);
+      await handleDefinition(validatedRequest, context);
       break;
     default:
-      // Unknown method - send error response
-      if (request.id !== undefined) {
+      if (validatedRequest.id !== undefined) {
         const response: JsonRpcResponse = {
           jsonrpc: "2.0",
-          id: request.id,
+          id: validatedRequest.id,
           error: {
             code: -32601,
-            message: `Method not found: ${request.method}`,
+            message: `Method not found: ${validatedRequest.method}`,
           },
         };
         writeMessage(response);
