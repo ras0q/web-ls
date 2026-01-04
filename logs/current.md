@@ -1,15 +1,15 @@
 # Current Project Status
 
-**Last Updated:** 2026-01-04 11:00 JST
+**Last Updated:** 2026-01-04 14:30 JST
 
 ## Overview
 
-CrawlLS is a Language Server Protocol (LSP) implementation for browsing web
+web-ls is a Language Server Protocol (LSP) implementation for browsing web
 content as Markdown files within TUI editors like Neovim.
 
 ## Implementation Progress
 
-### ✅ Completed Phases (1-9)
+### ✅ Completed Phases (1-10)
 
 | Phase | Title                           | Status | Key Deliverable                  |
 | ----- | ------------------------------- | ------ | -------------------------------- |
@@ -22,6 +22,7 @@ content as Markdown files within TUI editors like Neovim.
 | 7     | Handler Output Pattern          | ✅     | Pure side effect handling        |
 | 8     | Cache Key Readability           | ✅     | Domain-path cache structure      |
 | 9     | vscode-languageserver Migration | ✅     | Library-based connection         |
+| 10    | Project Rename                  | ✅     | crawl-ls → web-ls                |
 
 ### Current Test Status
 
@@ -103,7 +104,7 @@ content as Markdown files within TUI editors like Neovim.
 ### Cache Structure
 
 ```
-~/.cache/crawl-ls/
+~/.cache/web-ls/
 ├── example.com/
 │   ├── index.md
 │   └── article.md
@@ -132,26 +133,26 @@ content as Markdown files within TUI editors like Neovim.
 
 ## Next Steps (Priority Order)
 
-### Phase 9: Background Prefetching Queue (High Priority)
+### Phase 11: Background Prefetching Queue (High Priority)
 
 - Implement `PrefetchQueue` class
 - Hook `textDocument/didOpen` lifecycle
 - Extract all links and queue for background processing
 - Add rate limiting and sequential processing
 
-### Phase 10: LSP Lifecycle Events (Medium Priority)
+### Phase 12: LSP Lifecycle Events (Medium Priority)
 
 - Handle `textDocument/didChange` for document updates
 - Implement `textDocument/didClose` for cleanup
 - Track open documents in memory
 
-### Phase 11: Production Readiness (Medium Priority)
+### Phase 13: Production Readiness (Medium Priority)
 
 - Message buffering across multiple reads
 - Integration tests with actual LSP client
 - Error recovery and reconnection logic
 
-### Phase 12: Observability (Low Priority)
+### Phase 14: Observability (Low Priority)
 
 - Cache metrics (hit rate, total size)
 - Performance logging
@@ -221,11 +222,10 @@ deno task check:fix
 
 ## Recent Changes Summary
 
-**Latest Phase:** Phase 9 - vscode-languageserver Migration
+**Latest Phase:** Phase 10 - Project Rename
 
-- Migrated from manual JSON-RPC to `vscode-languageserver`
-- Eliminated 150+ lines of protocol handling code
-- Implemented handler wrapper pattern for clean registration
-- Removed 3 unused dependencies (arktype, protocol types)
-- Reduced total codebase by 24% (620 → 470 lines)
-- All 21 tests passing with improved type safety
+- Renamed project from "crawl-ls" to "web-ls" across all source code
+- Updated default cache directory: `/tmp/crawl-ls` → `/tmp/web-ls`
+- Updated test file paths and constants accordingly
+- All 21 tests passing after rename
+- Preserved historical logs with original naming for development context

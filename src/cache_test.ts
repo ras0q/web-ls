@@ -5,7 +5,7 @@
 import { assertEquals } from "@std/assert";
 import { checkCache, getCachePath, saveToCache } from "./cache.ts";
 
-const CACHE_DIR = "/tmp/crawl-ls";
+const CACHE_DIR = "/tmp/web-ls";
 
 Deno.test({
   name: "Cache - check existing cached file",

@@ -1,4 +1,4 @@
-# CrawlLS
+# web-ls
 
 A Language Server Protocol (LSP) implementation for browsing the web as a graph
 of Markdown files in TUI editors like Neovim.

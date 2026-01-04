@@ -1,5 +1,5 @@
 /**
- * Fetcher module for CrawlLS.
+ * Fetcher module for web-ls.
  * Handles fetching URLs, extracting content, and converting to Markdown.
  * Pure function-based implementation following functional programming principles.
  */

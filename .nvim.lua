@@ -1,26 +1,26 @@
 -- NOTE: Set `vim.opt.exrc = true` in your init.lua to use local config files for each project
 
-local cache_dir = vim.fn.stdpath("cache") .. "/crawl_ls"
+local cache_dir = vim.fn.stdpath("cache") .. "/web_ls"
 
 --- @type vim.lsp.Config
-local crawl_ls_config = {
+local web_ls_config = {
   cmd = { "deno", "task", "-q", "dev", "--cache-dir", cache_dir },
   filetypes = { "markdown" },
   single_file_support = true,
   on_init = function(client)
-    vim.api.nvim_create_user_command("LspCrawlCleanCache", function()
+    vim.api.nvim_create_user_command("LspWebLsCleanCache", function()
       if vim.fn.isdirectory(cache_dir) == 1 then
         vim.fn.delete(cache_dir, "rf")
-        vim.notify("crawl_ls cache deleted: " .. cache_dir, vim.log.levels.INFO)
+        vim.notify("web_ls cache deleted: " .. cache_dir, vim.log.levels.INFO)
       else
-        vim.notify("crawl_ls cache directory does not exist: " .. cache_dir, vim.log.levels.WARN)
+        vim.notify("web_ls cache directory does not exist: " .. cache_dir, vim.log.levels.WARN)
       end
-    end, { desc = "Delete crawl_ls LSP cache directory" })
+    end, { desc = "Delete web_ls LSP cache directory" })
 
-    vim.api.nvim_create_user_command("LspCrawlOpenURL", function(opts)
+    vim.api.nvim_create_user_command("LspWebLsOpenURL", function(opts)
       local url = opts.args
       if url == "" then
-        vim.notify("Usage: LspCrawlOpenURL <url>", vim.log.levels.ERROR)
+        vim.notify("Usage: LspWebLsOpenURL <url>", vim.log.levels.ERROR)
         return
       end
 
@@ -41,7 +41,7 @@ local crawl_ls_config = {
         end
 
         if err then
-          vim.notify("crawl_ls error: " .. err.message, vim.log.levels.ERROR)
+          vim.notify("web_ls error: " .. err.message, vim.log.levels.ERROR)
           return
         end
         if not result then
@@ -51,10 +51,10 @@ local crawl_ls_config = {
 
         vim.cmd("edit " .. vim.uri_to_fname(result.uri))
       end)
-    end, { nargs = 1, desc = "Open a URL with crawl_ls" })
+    end, { nargs = 1, desc = "Open a URL with web_ls" })
   end,
 }
 
-vim.lsp.config("crawl_ls", crawl_ls_config)
+vim.lsp.config("web_ls", web_ls_config)
 
-vim.lsp.enable({ "crawl_ls" })
+vim.lsp.enable({ "web_ls" })

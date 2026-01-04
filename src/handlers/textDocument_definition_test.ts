@@ -22,13 +22,13 @@ Deno.test({
   sanitizeResources: false,
   async fn() {
     // Create a temporary test file
-    const testFile = "/tmp/crawl-ls-def-test-1.md";
+    const testFile = "/tmp/web-ls-def-test-1.md";
     const testContent = "This is plain text without any links";
     await Deno.writeTextFile(testFile, testContent);
 
     try {
       const context: LspContext = {
-        cacheDir: "/tmp/crawl-ls-cache",
+        cacheDir: "/tmp/web-ls-cache",
         connection: createMockConnection(),
       };
 
@@ -56,13 +56,13 @@ Deno.test({
   sanitizeResources: false,
   async fn() {
     // Create a temporary test file
-    const testFile = "/tmp/crawl-ls-def-test-2.md";
+    const testFile = "/tmp/web-ls-def-test-2.md";
     const testContent = "Single line";
     await Deno.writeTextFile(testFile, testContent);
 
     try {
       const context: LspContext = {
-        cacheDir: "/tmp/crawl-ls-cache",
+        cacheDir: "/tmp/web-ls-cache",
         connection: createMockConnection(),
       };
 
@@ -90,13 +90,13 @@ Deno.test({
   sanitizeResources: false,
   async fn() {
     // Create a temporary test file with a link
-    const testFile = "/tmp/crawl-ls-def-test-3.md";
+    const testFile = "/tmp/web-ls-def-test-3.md";
     const testContent = "Check [Example](https://example.com) here";
     await Deno.writeTextFile(testFile, testContent);
 
     try {
       const context: LspContext = {
-        cacheDir: "/tmp/crawl-ls-cache",
+        cacheDir: "/tmp/web-ls-cache",
         connection: createMockConnection(),
       };
 
