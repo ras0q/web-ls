@@ -1,36 +1,29 @@
 # web-ls
 
-A Language Server Protocol (LSP) implementation for browsing the web as a graph
-of Markdown files in TUI editors like Neovim.
+Browse the web as Markdown files. A Language Server Protocol (LSP)
+implementation that turns web content into navigable documentation in your
+editor.
+
+## Quick Start
+
+Load a Markdown file with web links and use your editor's LSP features to
+navigate.
+
+Supports any LSP-compatible editor: Neovim, VS Code, Emacs, Vim, etc.
 
 ## Features
 
-- Fetch web pages and convert them to Markdown
-- Navigate between web pages using LSP's "Go to Definition" feature
-- Smart detection of external resources (videos, etc.)
-- Cache-based navigation for instant access
+- Convert web pages to Markdown for in-editor reading
+- Cache pages locally for instant navigation
+- Support for all LSP-compatible editors
 
-## Requirements
+## Installation
 
-- Deno 2.x
+```bash
+deno add jsr:@ras0q/web-ls
+```
 
-## Contributing
+## Configuration
 
-See [CONTRIBUTING.md](./CONTRIBUTING.md) for development guidelines and how to
-get started.
-
-## Architecture
-
-- **Fetcher**: Core logic for fetching and converting web pages to Markdown
-- **LSP Server**: vscode-languageserver-based protocol implementation
-- **Handlers**: Pure functions for LSP request processing
-- **Cache**: Domain-based file storage for fetched content
-
-## Technology Stack
-
-- Runtime: Deno 2
-- Language: TypeScript
-- Libraries:
-  - `vscode-languageserver`: LSP protocol implementation
-  - `defuddle`: HTML content extraction
-  - Native `fetch` for HTTP requests
+See [.nvim.lua](./.nvim.lua) for a Neovim example. For other editors, refer to
+your editor's LSP configuration documentation.
