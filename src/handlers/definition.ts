@@ -12,7 +12,7 @@ import { fetchUrl } from "../fetcher.ts";
  * Handle textDocument/definition request.
  * Returns cached markdown file location or null.
  */
-export async function handleTextDocumentDefinition(
+export async function handleDefinition(
   params: DefinitionParams,
   context: LspContext,
 ): Promise<Location | null> {

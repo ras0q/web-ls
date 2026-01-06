@@ -2,10 +2,7 @@
  * Initialize request handler for LSP server.
  */
 
-import {
-  type InitializeParams,
-  type InitializeResult,
-} from "vscode-languageserver";
+import type { InitializeParams, InitializeResult } from "vscode-languageserver";
 import type { LspContext } from "../types/lsp.ts";
 
 /**

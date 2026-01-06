@@ -3,7 +3,7 @@
  */
 
 import { assertEquals } from "@std/assert";
-import { handleTextDocumentDefinition } from "./textDocument_definition.ts";
+import { handleDefinition } from "./definition.ts";
 import type { DefinitionParams } from "vscode-languageserver";
 import type { LspContext } from "../types/lsp.ts";
 import type { Connection } from "vscode-languageserver";
@@ -37,7 +37,7 @@ Deno.test({
         position: { line: 0, character: 5 },
       };
 
-      const result = await handleTextDocumentDefinition(params, context);
+      const result = await handleDefinition(params, context);
 
       assertEquals(result, null);
     } finally {
@@ -71,7 +71,7 @@ Deno.test({
         position: { line: 10, character: 0 },
       };
 
-      const result = await handleTextDocumentDefinition(params, context);
+      const result = await handleDefinition(params, context);
 
       assertEquals(result, null);
     } finally {
@@ -105,7 +105,7 @@ Deno.test({
         position: { line: 0, character: 15 },
       };
 
-      const result = await handleTextDocumentDefinition(params, context);
+      const result = await handleDefinition(params, context);
 
       // Result should be null (external URL) or Location object (cached)
       assertEquals(

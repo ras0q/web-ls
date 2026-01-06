@@ -8,7 +8,7 @@ import { TextDocuments } from "vscode-languageserver";
 import { TextDocument } from "vscode-languageserver-textdocument";
 import { createConnection } from "vscode-languageserver/node.js";
 import { handleInitialize } from "./handlers/initialize.ts";
-import { handleTextDocumentDefinition } from "./handlers/textDocument_definition.ts";
+import { handleDefinition } from "./handlers/definition.ts";
 import type { LspContext } from "./types/lsp.ts";
 
 function createHandlerWrapper(context: LspContext) {
@@ -35,7 +35,7 @@ export function startLspServer(cacheDir: string): void {
 
   connection.onInitialize(wrap(handleInitialize));
   connection.onInitialized(() => {
-    connection.onDefinition(wrap(handleTextDocumentDefinition));
+    connection.onDefinition(wrap(handleDefinition));
   });
 
   connection.listen();
