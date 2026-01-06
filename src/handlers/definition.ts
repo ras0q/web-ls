@@ -4,7 +4,7 @@
 
 import type { DefinitionParams, Location } from "vscode-languageserver";
 import type { LspContext } from "../types/lsp.ts";
-import { extractLinkAtPosition } from "../link_parser.ts";
+import { extractUrl } from "../services/link_parser.ts";
 import { checkCache, getCachePath, saveToCache } from "../cache.ts";
 import { fetchUrl } from "../fetcher.ts";
 
@@ -16,27 +16,12 @@ export async function handleDefinition(
   params: DefinitionParams,
   context: LspContext,
 ): Promise<Location | null> {
-  const documentUri = params.textDocument.uri;
-  const position = params.position;
-
-  // Read document content from file
-  const filePath = documentUri.replace("file://", "");
-  const content = await Deno.readTextFile(filePath);
-  const lines = content.split("\n");
-
-  // Get line at cursor position
-  if (position.line >= lines.length) {
+  const urlWithRange = await extractUrl(params);
+  if (!urlWithRange) {
     return null;
   }
 
-  const line = lines[position.line];
-
-  // Extract link at cursor position
-  const url = extractLinkAtPosition(line, position.character);
-
-  if (!url) {
-    return null;
-  }
+  const { url } = urlWithRange;
 
   // Check cache first
   const cachePath = getCachePath(url, context.cacheDir);
